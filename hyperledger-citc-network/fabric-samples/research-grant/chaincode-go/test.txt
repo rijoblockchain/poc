@@ -1,0 +1,103 @@
+package main
+
+import (
+	"fmt"
+	//"time"
+	//"reflect"
+	"encoding/json"
+	"encoding/base64"
+)
+
+func main() {
+	// dateString := "2021-11-22"
+	// date, error := time.Parse("2006-01-02", dateString)
+  
+	// if error != nil {
+	// 	fmt.Println(error)
+	// 	return
+	// }
+
+	// fmt.Printf("Type of dateString: %T\n", dateString)
+	// fmt.Printf("Type of date: %T\n", date)
+	// fmt.Println()
+	// fmt.Printf("Value of dateString: %v\n", dateString)
+	// fmt.Printf("Value of date: %v", date)
+
+	type Benefit struct {
+		Name    string		`json:"name"`
+		Amount  float64		`json:"amount"`
+	}
+
+	benefitJson := `[{ "name": "travel",
+	"Amount": 4000.00
+},
+{
+	"name": "direct cost",
+	"Amount": 2000.00
+}
+]`
+
+var benefit []Benefit
+json.Unmarshal([]byte(benefitJson), &benefit)
+//fmt.Printf("Benefits : %+v", benefit)
+//var result map[string]interface{}
+//json.Unmarshal([]byte(benefitJson), &result)
+
+//benefit := result["name"].(map[string]interface{})
+
+//fmt.Println(SearchNested(benefit, "travel"))
+//fmt.Println(reflect.TypeOf(benefit))
+//fmt.Println(benefit[0].Name)
+
+paid_amount := 0.00
+for _, item := range benefit {
+	paid_amount += item.Amount
+} 
+//fmt.Println(paid_amount)
+var benefitMap = make(map[string]float64)
+for _, item := range benefit {
+	benefitMap[item.Name] = item.Amount
+} 
+benefitMap["travel"] = benefitMap["travel"] + 100
+fmt.Println(benefitMap["travel"])
+
+for k, v := range benefitMap { 
+    fmt.Printf("key[%s] value[%.2f]\n", k, v)
+}
+
+str: = "eDUwOTo6Q049Z3JhbnRvclVzZXIxLE9VPWNsaWVudCtPVT1ncmFudG9yK09VPWRlcGFydG1lbnQxOjpDTj1jYS5ncmFudG9yLmV4YW1wbGUuY29tLE89Z3JhbnRvci5leGFtcGxlLmNvbSxMPUh1cnNsZXksU1Q9SGFtcHNoaXJlLEM9VUs="
+data, err := base64.StdEncoding.DecodeString(str)
+        if err != nil {
+                log.Fatal("error:", err)
+        }
+
+        fmt.Printf("%q\n", data)
+}
+
+func SearchNested(obj interface{}, key string) (interface{}, bool) {
+	
+    switch t := obj.(type) {
+    case map[string]interface{}:
+        if v, ok := t[key]; ok {
+            return v, ok
+        }
+        for _, v := range t {
+            if result, ok := SearchNested(v, key); ok {
+                return result, ok
+            }
+        }
+    case []interface{}:
+        for _, v := range t {
+            if result, ok := SearchNested(v, key); ok {
+                return result, ok
+            }
+        }
+    }
+
+    // key not found
+    return nil, false
+}
+
+
+------------------------
+
